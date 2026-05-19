@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageId>Awin.Affiliate</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <Authors>Greco Labs</Authors>
     <Company>Greco Labs</Company>
     <Copyright>Copyright (c) 2026 Greco Labs</Copyright>
@@ -16,7 +16,7 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/gregojoao/awin-affiliate</RepositoryUrl>
-    <PackageReleaseNotes>Initial 1.0.0 release: tracking deep-link generation and reports surface (transactions, sales summary, click stats, generated link usage, advertisers) built on the Awin Publisher API.</PackageReleaseNotes>
+    <PackageReleaseNotes>1.1.0: multi-targeting for .NET 8 and .NET 10. Tracking deep-link generation and reports surface (transactions, sales summary, click stats, generated link usage, advertisers) built on the Awin Publisher API.</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
