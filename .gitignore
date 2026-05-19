@@ -1,0 +1,33 @@
+# Build output
+bin/
+obj/
+out/
+artifacts/
+
+# Rider / VS / VS Code
+.idea/
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Test results & coverage
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+*.trx
+*.lcov
+
+# NuGet
+*.nupkg
+*.snupkg
+project.lock.json
+packages/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

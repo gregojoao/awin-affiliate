@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Awin.Affiliate/Awin.Affiliate.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Awin.Affiliate.Tests/Awin.Affiliate.Tests.csproj" />
+  </Folder>
+</Solution>
