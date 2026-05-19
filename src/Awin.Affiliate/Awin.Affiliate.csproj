@@ -6,9 +6,9 @@
     <Nullable>enable</Nullable>
     <PackageId>Awin.Affiliate</PackageId>
     <Version>1.1.0</Version>
-    <Authors>Greco Labs</Authors>
-    <Company>Greco Labs</Company>
-    <Copyright>Copyright (c) 2026 Greco Labs</Copyright>
+    <Authors>GrecoLabs</Authors>
+    <Company>GrecoLabs</Company>
+    <Copyright>Copyright (c) 2026 GrecoLabs</Copyright>
     <Description>Minimal .NET SDK for Awin Publisher API affiliate link generation and reports (transactions, conversions, click stats).</Description>
     <PackageProjectUrl>https://github.com/gregojoao/awin-affiliate</PackageProjectUrl>
     <PackageTags>awin;affiliate;deeplink;publisher;transactions;reports;ecommerce;nuget</PackageTags>

@@ -9,7 +9,7 @@
 
 Small .NET SDK for the Awin Publisher API.
 
-Maintained by **Greco Labs**.
+Maintained by **GrecoLabs**.
 
 `Awin.Affiliate` helps affiliate bots, deal monitors, and revenue dashboards build Awin tracking deep links and pull reports (transactions, sales summary, click stats) from the Awin Publisher API.
 
