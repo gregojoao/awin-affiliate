@@ -37,13 +37,38 @@ public class AwinAffiliateHttpTransportTests
     [Fact]
     public async Task GetJson_MapsHttp401_ToAuthException()
     {
-        var handler = FakeHttpMessageHandler.Json("{\"error\":\"bad token\"}", HttpStatusCode.Unauthorized);
+        var handler = FakeHttpMessageHandler.Json(
+            "{\"error\":\"invalid_token\",\"message\":\"bad token\",\"accessToken\":\"secret-value\"}",
+            HttpStatusCode.Unauthorized);
         var transport = BuildTransport(handler, retries: 0);
 
         var act = async () => await transport.GetJsonAsync("/x", default);
         var ex = await act.Should().ThrowAsync<AwinAffiliateAuthException>();
         ex.Which.StatusCode.Should().Be(401);
+        ex.Which.Platform.Should().Be("awin");
+        ex.Which.Kind.Should().Be(AwinAffiliateCredentialFailureKind.Unauthorized);
+        ex.Which.ProviderErrorCode.Should().Be("invalid_token");
+        ex.Which.ProviderMessage.Should().Be("bad token");
+        ex.Which.IsCredentialError.Should().BeTrue();
+        ex.Which.IsRetryable.Should().BeFalse();
         ex.Which.ResponseBody.Should().Contain("bad token");
+        ex.Which.ResponseBody.Should().NotContain("secret-value");
+    }
+
+    [Fact]
+    public async Task GetJson_MapsHttp403_ToAuthException()
+    {
+        var handler = FakeHttpMessageHandler.Json(
+            "{\"code\":\"permission_denied\",\"detail\":\"publisher forbidden\"}",
+            HttpStatusCode.Forbidden);
+        var transport = BuildTransport(handler, retries: 0);
+
+        var act = async () => await transport.GetJsonAsync("/x", default);
+        var ex = await act.Should().ThrowAsync<AwinAffiliateAuthException>();
+        ex.Which.StatusCode.Should().Be(403);
+        ex.Which.Kind.Should().Be(AwinAffiliateCredentialFailureKind.Forbidden);
+        ex.Which.ProviderErrorCode.Should().Be("permission_denied");
+        ex.Which.ProviderMessage.Should().Be("publisher forbidden");
     }
 
     [Fact]
@@ -102,6 +127,18 @@ public class AwinAffiliateHttpTransportTests
         var act = async () => await transport.GetJsonAsync("/x", default);
         var ex = await act.Should().ThrowAsync<AwinAffiliateApiException>();
         ex.Which.StatusCode.Should().Be(502);
+    }
+
+    [Fact]
+    public async Task GetJson_MapsHttp500_ToApiExceptionWithoutAuthSignal()
+    {
+        var handler = FakeHttpMessageHandler.Json("{\"message\":\"server error\"}", HttpStatusCode.InternalServerError);
+        var transport = BuildTransport(handler, retries: 0);
+
+        var act = async () => await transport.GetJsonAsync("/x", default);
+
+        var ex = await act.Should().ThrowAsync<AwinAffiliateApiException>();
+        ex.Which.StatusCode.Should().Be(500);
     }
 
     [Fact]

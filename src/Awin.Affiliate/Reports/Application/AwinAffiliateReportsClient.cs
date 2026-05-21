@@ -54,6 +54,13 @@ public sealed class AwinAffiliateReportsClient : IAwinAffiliateReportsClient
     }
 
     /// <inheritdoc/>
+    public async Task ValidateCredentialsAsync(CancellationToken cancellationToken = default)
+    {
+        var path = AwinReportsQueryBuilder.BuildProgrammesPath(_options.PublisherId);
+        _ = await _transport.GetJsonAsync(path, cancellationToken);
+    }
+
+    /// <inheritdoc/>
     public async Task<AwinConversionPage> ListConversionsAsync(
         ListAwinConversionsRequest request,
         CancellationToken cancellationToken = default)
