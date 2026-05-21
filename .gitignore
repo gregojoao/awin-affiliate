@@ -28,6 +28,10 @@ packages/
 # Logs
 *.log
 
+# Local secrets
+.env.local
+.env.*
+
 # OS
 .DS_Store
 Thumbs.db

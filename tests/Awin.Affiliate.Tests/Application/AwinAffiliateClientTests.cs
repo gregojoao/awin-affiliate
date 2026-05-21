@@ -13,7 +13,9 @@ public class AwinAffiliateClientTests
     [Fact]
     public async Task GenerateAffiliateLink_BuildsCreadPhpUrl()
     {
-        var client = new AwinAffiliateClient(new HttpClient(), ValidOptions());
+        var handler = new FakeHttpMessageHandler((_, _) => throw new InvalidOperationException("network was called"));
+        using var http = new HttpClient(handler);
+        var client = new AwinAffiliateClient(http, ValidOptions());
 
         var result = await client.GenerateAffiliateLinkAsync(new AwinAffiliateLinkRequest
         {
@@ -28,6 +30,7 @@ public class AwinAffiliateClientTests
         result.Source.Should().Be(AwinAffiliateLinkSource.TrackingDeepLink);
         result.AdvertiserId.Should().Be("12345");
         result.OriginUrl.Should().Be(new Uri("https://www.kabum.com.br/produto/123"));
+        handler.Requests.Should().BeEmpty();
     }
 
     [Fact]

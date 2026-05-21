@@ -25,6 +25,7 @@ Maintained by **GrecoLabs**.
 | Click stats | Reads click/impression totals from the Awin creative report (when accessible). |
 | Generated link usage | Pulls per-link click/impression/conversion stats from the creative report. |
 | Advertisers | Lists every programme the publisher has access to via `GET /publishers/{publisherId}/programmes/`. |
+| Credential validation | Explicitly validates the configured Publisher API credentials and surfaces stable credential failure signals. |
 
 ## Installation
 
@@ -208,6 +209,23 @@ using var httpClient = new HttpClient();
 IAwinAffiliateReportsClient reports = new AwinAffiliateReportsClient(httpClient, options);
 ```
 
+Validate credentials explicitly before running scheduled jobs, onboarding a publisher account, or wiring integrations that need a stable "credentials rejected" signal:
+
+```csharp
+using Awin.Affiliate.Infrastructure;
+
+try
+{
+    await reports.ValidateCredentialsAsync();
+}
+catch (AwinAffiliateAuthException ex) when (ex.IsCredentialError)
+{
+    Console.WriteLine($"{ex.Platform}: {ex.Kind}");
+    Console.WriteLine(ex.ProviderErrorCode);
+    Console.WriteLine(ex.ProviderMessage);
+}
+```
+
 Or with DI:
 
 ```csharp
@@ -249,6 +267,27 @@ foreach (var tx in page.Items)
     Console.WriteLine($"{tx.AdvertiserName} — {tx.CommissionAmount} ({tx.Status})");
 }
 ```
+
+### `ValidateCredentialsAsync`
+
+Calls the lightweight programmes endpoint (`GET /publishers/{publisherId}/programmes/`) to verify that the configured `PublisherId` and `AccessToken` are accepted by Awin.
+
+```csharp
+await reports.ValidateCredentialsAsync();
+```
+
+On success, the method returns normally. On HTTP 401/403, it propagates `AwinAffiliateAuthException` with a stable credential signal:
+
+| Property | Value |
+|---|---|
+| `Platform` | `"awin"` |
+| `Kind` | `Unauthorized` for HTTP 401, `Forbidden` for HTTP 403 |
+| `ProviderErrorCode` | Error code extracted from Awin's JSON body, when present. |
+| `ProviderMessage` | Error message extracted from Awin's JSON body, when present. |
+| `IsCredentialError` | `true` |
+| `IsRetryable` | `false` |
+
+HTTP 429 still throws `AwinAffiliateRateLimitException`; 5xx, network, and timeout failures stay under `AwinAffiliateApiException` rather than being treated as credential failures.
 
 ### `GetSalesSummaryAsync`
 
@@ -326,6 +365,7 @@ var usage = await reports.GetGeneratedLinkUsageAsync(new AwinGeneratedLinkUsageR
 |---|---|---|
 | `GenerateAffiliateLinkAsync` | none (client-side build) | `ArgumentException` on missing `AdvertiserId` / invalid URL, `InvalidOperationException` on missing options. |
 | `ResolveAwinUrlAsync` | (HTTP GET on origin URL) | `AwinAffiliateApiException` on timeout. Returns the input URL on other failures. |
+| `ValidateCredentialsAsync` | `GET /publishers/{publisherId}/programmes/` | `AwinAffiliateAuthException` (401/403), `AwinAffiliateRateLimitException` (429), `AwinAffiliateApiException` (4xx/5xx/network/timeout). |
 | `ListConversionsAsync` | `GET /publishers/{publisherId}/transactions/` | `AwinAffiliateAuthException` (401/403), `AwinAffiliateRateLimitException` (429), `AwinAffiliateApiException` (4xx/5xx). |
 | `GetConversionAsync` | `GET /publishers/{publisherId}/transactions/` (filtered locally) | `AwinAffiliateNotFoundException` when nothing matches. Plus the same HTTP exceptions as above. |
 | `GetSalesSummaryAsync` | `GET /publishers/{publisherId}/transactions/` | Same as `ListConversionsAsync`. |
@@ -344,6 +384,19 @@ AwinAffiliateException
 └── AwinAffiliateUnsupportedException (feature not available)
 ```
 
+`AwinAffiliateAuthException` is the programmatic credential failure signal for integrations such as Awin-backed merchant adapters:
+
+| Property | Description |
+|---|---|
+| `Platform` | Stable platform id: `"awin"`. |
+| `Kind` | `AwinAffiliateCredentialFailureKind` (`Invalid`, `Expired`, `Unauthorized`, `Forbidden`). HTTP 401 maps to `Unauthorized`; HTTP 403 maps to `Forbidden`. |
+| `ProviderErrorCode` | Provider code extracted from JSON fields like `error`, `code`, or `errorCode`, when available. |
+| `ProviderMessage` | Provider message extracted from JSON fields like `message`, `error_description`, `errorMessage`, `detail`, or `title`, when available. |
+| `IsCredentialError` | Always `true`. |
+| `IsRetryable` | Always `false`. |
+
+The transport sanitizes authentication response bodies before attaching them to the exception, including token-like fields and bearer-token text.
+
 ## Limits and conventions
 
 - **31-day window**: Awin's `transactions/` and `reports/aggregated/` endpoints reject windows larger than 31 days. The SDK validates this client-side and throws `ArgumentException` early.
@@ -361,6 +414,8 @@ AwinAffiliateException
 4. Store the token in a secret manager and expose it as `AwinAffiliateReportsOptions.AccessToken`.
 
 The link client (`AwinAffiliateClient`) does not need a token — Awin tracking deep links are built client-side.
+
+`GenerateAffiliateLinkAsync` intentionally does not validate credentials over the network. If your application needs to confirm that an Awin `AccessToken` is valid, call `IAwinAffiliateReportsClient.ValidateCredentialsAsync` explicitly.
 
 ## Architecture
 

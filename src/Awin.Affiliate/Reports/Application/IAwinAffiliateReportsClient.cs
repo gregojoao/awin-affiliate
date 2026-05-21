@@ -9,6 +9,13 @@ namespace Awin.Affiliate.Reports.Application;
 /// </summary>
 public interface IAwinAffiliateReportsClient
 {
+    /// <summary>
+    /// Validates that the configured publisher id and access token can access Awin reports.
+    /// Returns normally when credentials are accepted; authentication failures surface as
+    /// <see cref="Awin.Affiliate.Infrastructure.AwinAffiliateAuthException"/>.
+    /// </summary>
+    Task ValidateCredentialsAsync(CancellationToken cancellationToken = default);
+
     /// <summary>Lists transactions (a.k.a. conversions) for the requested period.</summary>
     Task<AwinConversionPage> ListConversionsAsync(
         ListAwinConversionsRequest request,

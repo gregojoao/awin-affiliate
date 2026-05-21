@@ -76,6 +76,41 @@ public class AwinAffiliateReportsClientTests
     }
 
     [Fact]
+    public async Task ValidateCredentialsAsync_CallsProgrammesEndpoint()
+    {
+        var transport = new FakeAwinHttpTransport
+        {
+            Responder = path => path.Contains("/programmes/")
+                ? new AwinHttpResponse(200, "[]")
+                : throw new InvalidOperationException("unexpected endpoint")
+        };
+        var client = new AwinAffiliateReportsClient(transport, ValidOptions());
+
+        await client.ValidateCredentialsAsync();
+
+        transport.RequestedPaths.Should().ContainSingle();
+        transport.RequestedPaths[0].Should().Be("/publishers/987654/programmes/");
+    }
+
+    [Theory]
+    [InlineData(401, AwinAffiliateCredentialFailureKind.Unauthorized)]
+    [InlineData(403, AwinAffiliateCredentialFailureKind.Forbidden)]
+    public async Task ValidateCredentialsAsync_PropagatesAuthException(int statusCode, AwinAffiliateCredentialFailureKind kind)
+    {
+        var transport = new FakeAwinHttpTransport
+        {
+            Responder = _ => throw new AwinAffiliateAuthException("nope", statusCode, null, kind)
+        };
+        var client = new AwinAffiliateReportsClient(transport, ValidOptions());
+
+        var act = async () => await client.ValidateCredentialsAsync();
+
+        var ex = await act.Should().ThrowAsync<AwinAffiliateAuthException>();
+        ex.Which.Kind.Should().Be(kind);
+        ex.Which.StatusCode.Should().Be(statusCode);
+    }
+
+    [Fact]
     public async Task GetClickStatsAsync_AggregatesAcrossRows()
     {
         var transport = new FakeAwinHttpTransport

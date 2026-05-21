@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageId>Awin.Affiliate</PackageId>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <Authors>GrecoLabs</Authors>
     <Company>GrecoLabs</Company>
     <Copyright>Copyright (c) 2026 GrecoLabs</Copyright>
@@ -16,7 +16,7 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/gregojoao/awin-affiliate</RepositoryUrl>
-    <PackageReleaseNotes>1.1.0: multi-targeting for .NET 8 and .NET 10. Tracking deep-link generation and reports surface (transactions, sales summary, click stats, generated link usage, advertisers) built on the Awin Publisher API.</PackageReleaseNotes>
+    <PackageReleaseNotes>1.2.0: Adds stable credential failure signals for Awin authentication failures and explicit reports credential validation. 1.1.0: multi-targeting for .NET 8 and .NET 10. Tracking deep-link generation and reports surface (transactions, sales summary, click stats, generated link usage, advertisers) built on the Awin Publisher API.</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
