@@ -119,7 +119,7 @@ public class AwinAffiliateClientTests
         using var http = new HttpClient(handler);
         var client = new AwinAffiliateClient(http, ValidOptions());
 
-        var original = new Uri("https://s.click.test/abc");
+        var original = new Uri("https://www.awin1.com/abc");
         var resolved = await client.ResolveAwinUrlAsync(original);
 
         resolved.Should().Be(original);
@@ -133,9 +133,23 @@ public class AwinAffiliateClientTests
         using var http = new HttpClient(handler);
         var client = new AwinAffiliateClient(http, ValidOptions());
 
-        var original = new Uri("https://s.click.test/abc");
+        var original = new Uri("https://www.awin1.com/abc");
         var resolved = await client.ResolveAwinUrlAsync(original);
 
         resolved.Should().Be(original);
+    }
+
+    [Fact]
+    public async Task ResolveAwinUrlAsync_RejectsUntrustedHostBeforeNetwork()
+    {
+        var handler = new FakeHttpMessageHandler((_, _) => throw new InvalidOperationException("network was called"));
+        using var http = new HttpClient(handler);
+        var client = new AwinAffiliateClient(http, ValidOptions());
+
+        var act = () => client.ResolveAwinUrlAsync(new Uri("https://169.254.169.254/latest/meta-data"));
+
+        await act.Should().ThrowAsync<ArgumentException>()
+            .WithMessage("*awin.com*");
+        handler.Requests.Should().BeEmpty();
     }
 }

@@ -53,17 +53,17 @@ public sealed class AwinAffiliateOptions
         }
 
         if (TrackingEndpoint is null ||
-            (TrackingEndpoint.Scheme != Uri.UriSchemeHttp && TrackingEndpoint.Scheme != Uri.UriSchemeHttps))
+            TrackingEndpoint.Scheme != Uri.UriSchemeHttps)
         {
             throw new InvalidOperationException(
-                "Awin affiliate TrackingEndpoint must be an absolute HTTP/HTTPS URL.");
+                "Awin affiliate TrackingEndpoint must be an absolute HTTPS URL.");
         }
 
         if (Endpoint is null ||
-            (Endpoint.Scheme != Uri.UriSchemeHttp && Endpoint.Scheme != Uri.UriSchemeHttps))
+            Endpoint.Scheme != Uri.UriSchemeHttps)
         {
             throw new InvalidOperationException(
-                "Awin affiliate Endpoint must be an absolute HTTP/HTTPS URL.");
+                "Awin affiliate Endpoint must be an absolute HTTPS URL.");
         }
 
         if (Timeout <= TimeSpan.Zero)

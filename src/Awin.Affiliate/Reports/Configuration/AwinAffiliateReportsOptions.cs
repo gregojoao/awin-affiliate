@@ -59,9 +59,9 @@ public sealed class AwinAffiliateReportsOptions
         }
 
         if (Endpoint is null ||
-            (Endpoint.Scheme != Uri.UriSchemeHttp && Endpoint.Scheme != Uri.UriSchemeHttps))
+            Endpoint.Scheme != Uri.UriSchemeHttps)
         {
-            throw new InvalidOperationException("Awin Reports Endpoint must be an absolute HTTP/HTTPS URL.");
+            throw new InvalidOperationException("Awin Reports Endpoint must be an absolute HTTPS URL.");
         }
 
         if (Timeout <= TimeSpan.Zero)

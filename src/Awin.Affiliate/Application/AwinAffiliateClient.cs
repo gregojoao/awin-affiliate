@@ -65,6 +65,7 @@ public sealed class AwinAffiliateClient : IAwinAffiliateClient
     public async Task<Uri> ResolveAwinUrlAsync(Uri shortUrl, CancellationToken cancellationToken = default)
     {
         EnsureValidOriginUrl(shortUrl);
+        EnsureTrustedAwinResolveUrl(shortUrl);
 
         using var timeoutCts = CreateTimeoutTokenSource(cancellationToken);
         return await ResolveAwinUrlCoreAsync(shortUrl, timeoutCts.Token);
@@ -72,6 +73,8 @@ public sealed class AwinAffiliateClient : IAwinAffiliateClient
 
     private async Task<Uri> ResolveAwinUrlCoreAsync(Uri shortUrl, CancellationToken cancellationToken)
     {
+        EnsureTrustedAwinResolveUrl(shortUrl);
+
         using var request = new HttpRequestMessage(HttpMethod.Get, shortUrl);
         request.Headers.UserAgent.ParseAdd(AwinAffiliateDefaults.UserAgent);
 
@@ -129,4 +132,23 @@ public sealed class AwinAffiliateClient : IAwinAffiliateClient
     private static bool IsValidHttpUri(Uri uri)
         => uri.IsAbsoluteUri &&
            (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
+
+    private static void EnsureTrustedAwinResolveUrl(Uri shortUrl)
+    {
+        if (!IsTrustedAwinResolveHost(shortUrl))
+        {
+            throw new ArgumentException(
+                "Awin URL resolving is only allowed for awin.com and awin1.com hosts.",
+                nameof(shortUrl));
+        }
+    }
+
+    private static bool IsTrustedAwinResolveHost(Uri uri)
+    {
+        var host = uri.IdnHost;
+        return host.Equals("awin.com", StringComparison.OrdinalIgnoreCase) ||
+               host.EndsWith(".awin.com", StringComparison.OrdinalIgnoreCase) ||
+               host.Equals("awin1.com", StringComparison.OrdinalIgnoreCase) ||
+               host.EndsWith(".awin1.com", StringComparison.OrdinalIgnoreCase);
+    }
 }
