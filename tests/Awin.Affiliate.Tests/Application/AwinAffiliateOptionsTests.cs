@@ -44,6 +44,36 @@ public class AwinAffiliateOptionsTests
         act.Should().Throw<InvalidOperationException>().WithMessage("*Timeout*");
     }
 
+    [Fact]
+    public void Validate_RejectsPlainHttpEndpoints()
+    {
+        var options = new AwinAffiliateOptions
+        {
+            PublisherId = "12345",
+            Endpoint = new Uri("http://api.awin.test"),
+            TrackingEndpoint = new Uri("https://www.awin1.com/cread.php")
+        };
+
+        var act = () => options.Validate();
+
+        act.Should().Throw<InvalidOperationException>().WithMessage("*HTTPS*");
+    }
+
+    [Fact]
+    public void Validate_RejectsPlainHttpTrackingEndpoint()
+    {
+        var options = new AwinAffiliateOptions
+        {
+            PublisherId = "12345",
+            Endpoint = new Uri("https://api.awin.com"),
+            TrackingEndpoint = new Uri("http://www.awin1.com/cread.php")
+        };
+
+        var act = () => options.Validate();
+
+        act.Should().Throw<InvalidOperationException>().WithMessage("*HTTPS*");
+    }
+
     [Theory]
     [InlineData("COLE_PUBLISHER_ID")]
     [InlineData("cole_seu_id")]

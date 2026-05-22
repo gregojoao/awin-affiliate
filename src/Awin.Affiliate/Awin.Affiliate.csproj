@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageId>Awin.Affiliate</PackageId>
-    <Version>1.2.0</Version>
+    <Version>1.2.1</Version>
     <Authors>GrecoLabs</Authors>
     <Company>GrecoLabs</Company>
     <Copyright>Copyright (c) 2026 GrecoLabs</Copyright>
